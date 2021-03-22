@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_complete_guide/result.dart';
 
-import './question.dart';
-import './answer.dart';
+import './quiz.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,31 +9,48 @@ void main() {
 
 class MyApp extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return _MyAppState();
-  }
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   var _questionIndex = 0;
-
-  // Build a list of maps where each map has a question string and a list of answers associated to the question
-  var questions = [
+  var _totalScore = 0;
+  final _questions = const [
     {
-      "questionText": "What's your fav color?",
-      "answerChoices": ["blue", "red", "green", "yellow"]
+      "question": "What is your favorite color?",
+      "answers": [
+        {"text": "blue", "score": 10},
+        {"text": "red", "score": 20},
+        {"text": "green", "score": 30},
+      ]
     },
     {
-      "questionText": "What's your fav drink?",
-      "answerChoices": ["beer", "red wine", "white wine", "gin"]
+      "question": "What is your favorite drink?",
+      "answers": [
+        {"text": "vodka", "score": 10},
+        {"text": "gin", "score": 20},
+        {"text": "beer", "score": 30},
+      ]
     },
     {
-      "questionText": "What's your fav instrument?",
-      "answerChoices": ["guitar", "violin", "tabla", "piano"]
-    }
+      "question": "What is your favorite sport?",
+      "answers": [
+        {"text": "cricket", "score": 10},
+        {"text": "football", "score": 20},
+        {"text": "hockey", "score": 30},
+      ]
+    },
   ];
 
-  void _answerQuestion() {
+  void _resetQuiz() {
+    setState(() {
+      _questionIndex = 0;
+      _totalScore = 0;
+    });
+  }
+
+  void _answerQuestion(int score) {
+    _totalScore += score;
     setState(() {
       _questionIndex += 1;
     });
@@ -46,15 +63,13 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text("First App"),
         ),
-        body: Column(
-          children: [
-            Question(questions[_questionIndex]["questionText"]),
-            ...(questions[_questionIndex]["answerChoices"] as List<String>)
-                .map((answerChoice) {
-              return Answer(_answerQuestion, answerChoice);
-            }).toList()
-          ],
-        ),
+        body: _questionIndex < _questions.length
+            ? Quiz(
+                _questionIndex,
+                _questions,
+                _answerQuestion,
+              )
+            : Result(_totalScore, _resetQuiz),
       ),
     );
   }
